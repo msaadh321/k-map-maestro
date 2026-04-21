@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Sparkles, RotateCcw, Variable } from "lucide-react";
+import { Copy, Check, Sparkles, RotateCcw, Variable, Download } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -17,6 +17,7 @@ import {
   parseMinterms,
 } from "@/lib/kmap-solver";
 import { toast } from "sonner";
+import { exportSolutionPDF } from "@/lib/pdf-export";
 
 const GROUP_COLORS = [
   "var(--group-1)",
@@ -257,15 +258,29 @@ export function SolverPanel() {
             <span className="text-xs uppercase tracking-wider text-muted-foreground">
               Simplified {mode}
             </span>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={copyExpression}
-              className="h-7 gap-1.5 text-xs"
-            >
-              {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-              {copied ? "Copied" : "Copy"}
-            </Button>
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => {
+                  exportSolutionPDF({ numVars, values, mode, result });
+                  toast.success("PDF exported");
+                }}
+                className="h-7 gap-1.5 text-xs"
+              >
+                <Download className="h-3.5 w-3.5" />
+                PDF
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={copyExpression}
+                className="h-7 gap-1.5 text-xs"
+              >
+                {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {copied ? "Copied" : "Copy"}
+              </Button>
+            </div>
           </div>
           <AnimatePresence mode="wait">
             <motion.div
