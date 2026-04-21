@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { KMapGrid } from "./KMapGrid";
+import { TruthTable } from "./TruthTable";
 import {
   type CellValue,
   type Mode,
@@ -117,10 +118,11 @@ export function SolverPanel() {
         </div>
 
         <Tabs defaultValue="kmap" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-secondary">
+          <TabsList className="grid w-full grid-cols-4 bg-secondary">
             <TabsTrigger value="kmap">K-Map</TabsTrigger>
-            <TabsTrigger value="minterms">Σ Minterms</TabsTrigger>
-            <TabsTrigger value="maxterms">Π Maxterms</TabsTrigger>
+            <TabsTrigger value="truth">Truth</TabsTrigger>
+            <TabsTrigger value="minterms">Σ Min</TabsTrigger>
+            <TabsTrigger value="maxterms">Π Max</TabsTrigger>
           </TabsList>
 
           <TabsContent value="kmap" className="mt-5">
