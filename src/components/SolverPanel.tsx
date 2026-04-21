@@ -154,6 +154,39 @@ export function SolverPanel() {
             </div>
           </TabsContent>
 
+          <TabsContent value="truth" className="mt-5 space-y-4">
+            <p className="text-xs text-muted-foreground">
+              Click the F column to cycle output:{" "}
+              <span className="font-mono text-muted-foreground">0</span> →{" "}
+              <span className="font-mono text-primary">1</span> →{" "}
+              <span className="font-mono text-[var(--grid-x)]">X</span>. The K-map updates live.
+            </p>
+            <TruthTable
+              numVars={numVars}
+              values={values}
+              onChange={(idx, value) =>
+                setValues((prev) => {
+                  const next = [...prev];
+                  next[idx] = value;
+                  return next;
+                })
+              }
+            />
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={reset} className="gap-1.5">
+                <RotateCcw className="h-3.5 w-3.5" />
+                Clear
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setValues(Array(1 << numVars).fill(1))}
+              >
+                All 1s
+              </Button>
+            </div>
+          </TabsContent>
+
           <TabsContent value="minterms" className="mt-5 space-y-4">
             <div>
               <Label htmlFor="mt" className="text-xs text-muted-foreground">
