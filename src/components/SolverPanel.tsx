@@ -9,6 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { KMapGrid } from "./KMapGrid";
+import { TruthTable } from "./TruthTable";
 import {
   type CellValue,
   type Mode,
@@ -117,10 +118,11 @@ export function SolverPanel() {
         </div>
 
         <Tabs defaultValue="kmap" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-secondary">
+          <TabsList className="grid w-full grid-cols-4 bg-secondary">
             <TabsTrigger value="kmap">K-Map</TabsTrigger>
-            <TabsTrigger value="minterms">Σ Minterms</TabsTrigger>
-            <TabsTrigger value="maxterms">Π Maxterms</TabsTrigger>
+            <TabsTrigger value="truth">Truth</TabsTrigger>
+            <TabsTrigger value="minterms">Σ Min</TabsTrigger>
+            <TabsTrigger value="maxterms">Π Max</TabsTrigger>
           </TabsList>
 
           <TabsContent value="kmap" className="mt-5">
@@ -138,6 +140,39 @@ export function SolverPanel() {
               />
             </div>
             <div className="mt-4 flex gap-2">
+              <Button variant="outline" size="sm" onClick={reset} className="gap-1.5">
+                <RotateCcw className="h-3.5 w-3.5" />
+                Clear
+              </Button>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setValues(Array(1 << numVars).fill(1))}
+              >
+                All 1s
+              </Button>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="truth" className="mt-5 space-y-4">
+            <p className="text-xs text-muted-foreground">
+              Click the F column to cycle output:{" "}
+              <span className="font-mono text-muted-foreground">0</span> →{" "}
+              <span className="font-mono text-primary">1</span> →{" "}
+              <span className="font-mono text-[var(--grid-x)]">X</span>. The K-map updates live.
+            </p>
+            <TruthTable
+              numVars={numVars}
+              values={values}
+              onChange={(idx, value) =>
+                setValues((prev) => {
+                  const next = [...prev];
+                  next[idx] = value;
+                  return next;
+                })
+              }
+            />
+            <div className="flex gap-2">
               <Button variant="outline" size="sm" onClick={reset} className="gap-1.5">
                 <RotateCcw className="h-3.5 w-3.5" />
                 Clear
