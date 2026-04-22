@@ -37,6 +37,7 @@ export function SolverPanel() {
   const [copied, setCopied] = useState(false);
   const [mintermInput, setMintermInput] = useState("Σ(1,3,5,7,9,11,13,15)");
   const [maxtermInput, setMaxtermInput] = useState("Π(0,2,4,6,8,10,12,14)");
+  const [exprInput, setExprInput] = useState("A'B + AB'C + BC");
 
   const handleVarChange = (n: 2 | 3 | 4) => {
     setNumVars(n);
