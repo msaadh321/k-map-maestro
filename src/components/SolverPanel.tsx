@@ -29,6 +29,18 @@ const GROUP_COLORS = [
   "var(--group-6)",
 ];
 
+const EXPR_EXAMPLES: { expr: string; label: string; vars: 2 | 3 | 4 }[] = [
+  { expr: "A'B + AB'", label: "XOR (2-var)", vars: 2 },
+  { expr: "AB + A'B'", label: "XNOR (2-var)", vars: 2 },
+  { expr: "A'B + AB'C + BC", label: "Mixed (3-var)", vars: 3 },
+  { expr: "(A+B)(B+C)", label: "POS form (3-var)", vars: 3 },
+  { expr: "A'B'C' + ABC", label: "Min/max (3-var)", vars: 3 },
+  { expr: "AB + CD", label: "Two pairs (4-var)", vars: 4 },
+  { expr: "A'B'C'D' + ABCD + AB'C'D", label: "Sparse (4-var)", vars: 4 },
+  { expr: "(A+B)(C'+D)", label: "POS (4-var)", vars: 4 },
+  { expr: "!A*B*C + A*!B*!C*D", label: "C-style (4-var)", vars: 4 },
+];
+
 export function SolverPanel() {
   const [numVars, setNumVars] = useState<2 | 3 | 4>(4);
   const [values, setValues] = useState<CellValue[]>(() => Array(16).fill(0));
@@ -96,6 +108,23 @@ export function SolverPanel() {
       toast.success(`Parsed expression → ${minterms.length} minterm${minterms.length === 1 ? "" : "s"}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Invalid expression");
+    }
+  };
+
+  const loadExample = (expr: string, vars: 2 | 3 | 4) => {
+    setExprInput(expr);
+    try {
+      const targetVars = vars > numVars ? vars : numVars;
+      if (targetVars !== numVars) setNumVars(targetVars);
+      const { minterms } = parseExpression(expr, targetVars);
+      const total = 1 << targetVars;
+      const next: CellValue[] = Array(total).fill(0);
+      minterms.forEach((m) => (next[m] = 1));
+      setValues(next);
+      setMode("SOP");
+      toast.success(`Loaded example → ${minterms.length} minterm${minterms.length === 1 ? "" : "s"}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Invalid example");
     }
   };
 
@@ -217,11 +246,23 @@ export function SolverPanel() {
                 className="mt-1.5 font-mono"
                 placeholder="A'B + AB'C + BC"
               />
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Examples: <span className="font-mono">A'B + AB'</span>,{" "}
-                <span className="font-mono">(A+B)(C'+D)</span>,{" "}
-                <span className="font-mono">!A*B + A*!B</span>
+            </div>
+            <div>
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+                Quick examples — click to load
               </p>
+              <div className="flex flex-wrap gap-1.5">
+                {EXPR_EXAMPLES.filter((ex) => ex.vars <= numVars).map((ex) => (
+                  <button
+                    key={ex.expr}
+                    onClick={() => loadExample(ex.expr, ex.vars as 2 | 3 | 4)}
+                    className="rounded-md border border-border bg-secondary px-2.5 py-1 font-mono text-xs text-foreground transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
+                    title={ex.label}
+                  >
+                    {ex.expr}
+                  </button>
+                ))}
+              </div>
             </div>
             <Button onClick={applyExpression} className="w-full gap-2">
               <Sparkles className="h-4 w-4" />
