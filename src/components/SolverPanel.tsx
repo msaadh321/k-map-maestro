@@ -16,6 +16,7 @@ import {
   solve,
   parseMinterms,
 } from "@/lib/kmap-solver";
+import { parseExpression } from "@/lib/expression-parser";
 import { toast } from "sonner";
 import { exportSolutionPDF } from "@/lib/pdf-export";
 
@@ -36,6 +37,7 @@ export function SolverPanel() {
   const [copied, setCopied] = useState(false);
   const [mintermInput, setMintermInput] = useState("Σ(1,3,5,7,9,11,13,15)");
   const [maxtermInput, setMaxtermInput] = useState("Π(0,2,4,6,8,10,12,14)");
+  const [exprInput, setExprInput] = useState("A'B + AB'C + BC");
 
   const handleVarChange = (n: 2 | 3 | 4) => {
     setNumVars(n);
@@ -83,6 +85,20 @@ export function SolverPanel() {
     }
   };
 
+  const applyExpression = () => {
+    try {
+      const { minterms } = parseExpression(exprInput, numVars);
+      const total = 1 << numVars;
+      const next: CellValue[] = Array(total).fill(0);
+      minterms.forEach((m) => (next[m] = 1));
+      setValues(next);
+      setMode("SOP");
+      toast.success(`Parsed expression → ${minterms.length} minterm${minterms.length === 1 ? "" : "s"}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Invalid expression");
+    }
+  };
+
   const reset = () => setValues(Array(1 << numVars).fill(0));
 
   const copyExpression = () => {
@@ -119,9 +135,10 @@ export function SolverPanel() {
         </div>
 
         <Tabs defaultValue="kmap" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-secondary">
+          <TabsList className="grid w-full grid-cols-5 bg-secondary">
             <TabsTrigger value="kmap">K-Map</TabsTrigger>
             <TabsTrigger value="truth">Truth</TabsTrigger>
+            <TabsTrigger value="expr">Expr</TabsTrigger>
             <TabsTrigger value="minterms">Σ Min</TabsTrigger>
             <TabsTrigger value="maxterms">Π Max</TabsTrigger>
           </TabsList>
@@ -186,6 +203,30 @@ export function SolverPanel() {
                 All 1s
               </Button>
             </div>
+          </TabsContent>
+
+          <TabsContent value="expr" className="mt-5 space-y-4">
+            <div>
+              <Label htmlFor="expr" className="text-xs text-muted-foreground">
+                Boolean expression — ' or ! (NOT), + (OR), implicit or * (AND), parentheses
+              </Label>
+              <Input
+                id="expr"
+                value={exprInput}
+                onChange={(e) => setExprInput(e.target.value)}
+                className="mt-1.5 font-mono"
+                placeholder="A'B + AB'C + BC"
+              />
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                Examples: <span className="font-mono">A'B + AB'</span>,{" "}
+                <span className="font-mono">(A+B)(C'+D)</span>,{" "}
+                <span className="font-mono">!A*B + A*!B</span>
+              </p>
+            </div>
+            <Button onClick={applyExpression} className="w-full gap-2">
+              <Sparkles className="h-4 w-4" />
+              Generate K-Map
+            </Button>
           </TabsContent>
 
           <TabsContent value="minterms" className="mt-5 space-y-4">
