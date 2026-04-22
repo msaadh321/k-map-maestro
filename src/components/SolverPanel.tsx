@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Copy, Check, Sparkles, RotateCcw, Variable, Download } from "lucide-react";
+import { Copy, Check, Sparkles, RotateCcw, Variable, Download, History } from "lucide-react";
+import { HistorySidebar, type HistoryEntry } from "./HistorySidebar";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -50,6 +51,43 @@ export function SolverPanel() {
   const [mintermInput, setMintermInput] = useState("Σ(1,3,5,7,9,11,13,15)");
   const [maxtermInput, setMaxtermInput] = useState("Π(0,2,4,6,8,10,12,14)");
   const [exprInput, setExprInput] = useState("A'B + AB'C + BC");
+  const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [historyOpen, setHistoryOpen] = useState(false);
+
+  // Hydrate history from localStorage on mount
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("kmap.history");
+      if (raw) setHistory(JSON.parse(raw));
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  // Persist history changes
+  useEffect(() => {
+    try {
+      localStorage.setItem("kmap.history", JSON.stringify(history));
+    } catch {
+      // ignore quota
+    }
+  }, [history]);
+
+  const pushHistory = (expr: string, vars: 2 | 3 | 4, source: "example" | "manual") => {
+    const trimmed = expr.trim();
+    if (!trimmed) return;
+    setHistory((prev) => {
+      const filtered = prev.filter((h) => !(h.expr === trimmed && h.vars === vars));
+      const next: HistoryEntry = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+        expr: trimmed,
+        vars,
+        source,
+        ts: Date.now(),
+      };
+      return [next, ...filtered].slice(0, 30);
+    });
+  };
 
   const handleVarChange = (n: 2 | 3 | 4) => {
     setNumVars(n);
@@ -105,6 +143,7 @@ export function SolverPanel() {
       minterms.forEach((m) => (next[m] = 1));
       setValues(next);
       setMode("SOP");
+      pushHistory(exprInput, numVars, "manual");
       toast.success(`Parsed expression → ${minterms.length} minterm${minterms.length === 1 ? "" : "s"}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Invalid expression");
@@ -122,10 +161,16 @@ export function SolverPanel() {
       minterms.forEach((m) => (next[m] = 1));
       setValues(next);
       setMode("SOP");
+      pushHistory(expr, targetVars, "example");
       toast.success(`Loaded example → ${minterms.length} minterm${minterms.length === 1 ? "" : "s"}`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "Invalid example");
     }
+  };
+
+  const loadFromHistory = (entry: HistoryEntry) => {
+    loadExample(entry.expr, entry.vars);
+    setHistoryOpen(false);
   };
 
   const reset = () => setValues(Array(1 << numVars).fill(0));
