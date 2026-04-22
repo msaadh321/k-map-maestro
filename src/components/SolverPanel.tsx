@@ -506,6 +506,15 @@ export function SolverPanel() {
           )}
         </AnimatePresence>
       </Card>
+
+      <HistorySidebar
+        open={historyOpen}
+        onClose={() => setHistoryOpen(false)}
+        entries={history}
+        onSelect={loadFromHistory}
+        onClear={() => setHistory([])}
+        onRemove={(id) => setHistory((prev) => prev.filter((h) => h.id !== id))}
+      />
     </div>
   );
 }
