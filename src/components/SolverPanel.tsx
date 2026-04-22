@@ -217,11 +217,23 @@ export function SolverPanel() {
                 className="mt-1.5 font-mono"
                 placeholder="A'B + AB'C + BC"
               />
-              <p className="mt-2 text-[11px] text-muted-foreground">
-                Examples: <span className="font-mono">A'B + AB'</span>,{" "}
-                <span className="font-mono">(A+B)(C'+D)</span>,{" "}
-                <span className="font-mono">!A*B + A*!B</span>
+            </div>
+            <div>
+              <p className="mb-2 text-[11px] uppercase tracking-wider text-muted-foreground">
+                Quick examples — click to load
               </p>
+              <div className="flex flex-wrap gap-1.5">
+                {EXPR_EXAMPLES.filter((ex) => ex.vars <= numVars).map((ex) => (
+                  <button
+                    key={ex.expr}
+                    onClick={() => loadExample(ex.expr, ex.vars as 2 | 3 | 4)}
+                    className="rounded-md border border-border bg-secondary px-2.5 py-1 font-mono text-xs text-foreground transition-colors hover:border-primary hover:bg-primary/10 hover:text-primary"
+                    title={ex.label}
+                  >
+                    {ex.expr}
+                  </button>
+                ))}
+              </div>
             </div>
             <Button onClick={applyExpression} className="w-full gap-2">
               <Sparkles className="h-4 w-4" />
