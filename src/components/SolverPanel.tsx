@@ -186,25 +186,40 @@ export function SolverPanel() {
     <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
       {/* LEFT: Input */}
       <Card className="border-border bg-gradient-surface p-6 shadow-card">
-        <div className="mb-5 flex items-center justify-between">
+        <div className="mb-5 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Variable className="h-5 w-5 text-primary" />
             <h2 className="text-lg font-semibold">Input</h2>
           </div>
-          <div className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-1">
-            {([2, 3, 4] as const).map((n) => (
-              <button
-                key={n}
-                onClick={() => handleVarChange(n)}
-                className={`rounded-md px-3 py-1 text-xs font-mono font-semibold transition-colors ${
-                  numVars === n
-                    ? "bg-primary text-primary-foreground"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                {n}-var
-              </button>
-            ))}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => setHistoryOpen(true)}
+              className="relative inline-flex items-center gap-1.5 rounded-lg border border-border bg-secondary px-2.5 py-1 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/60 hover:text-foreground"
+              title="Open input history"
+            >
+              <History className="h-3.5 w-3.5" />
+              <span className="hidden sm:inline">History</span>
+              {history.length > 0 && (
+                <span className="rounded bg-primary/20 px-1 font-mono text-[10px] text-primary">
+                  {history.length}
+                </span>
+              )}
+            </button>
+            <div className="flex items-center gap-1 rounded-lg border border-border bg-secondary p-1">
+              {([2, 3, 4] as const).map((n) => (
+                <button
+                  key={n}
+                  onClick={() => handleVarChange(n)}
+                  className={`rounded-md px-3 py-1 text-xs font-mono font-semibold transition-colors ${
+                    numVars === n
+                      ? "bg-primary text-primary-foreground"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {n}-var
+                </button>
+              ))}
+            </div>
           </div>
         </div>
 
