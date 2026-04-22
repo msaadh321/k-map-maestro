@@ -168,6 +168,27 @@ export function SolverPanel() {
     }
   };
 
+  const historyPreviews = useMemo(() => {
+    const map: Record<string, { mintermCount: number; simplified: string; error?: string }> = {};
+    for (const h of history) {
+      try {
+        const { minterms } = parseExpression(h.expr, h.vars);
+        const total = 1 << h.vars;
+        const vals: CellValue[] = Array(total).fill(0);
+        minterms.forEach((m) => (vals[m] = 1));
+        const r = solve(h.vars, vals, "SOP");
+        map[h.id] = { mintermCount: minterms.length, simplified: r.expression };
+      } catch (e) {
+        map[h.id] = {
+          mintermCount: 0,
+          simplified: "—",
+          error: e instanceof Error ? e.message : "invalid",
+        };
+      }
+    }
+    return map;
+  }, [history]);
+
   const loadFromHistory = (entry: HistoryEntry) => {
     loadExample(entry.expr, entry.vars);
     setHistoryOpen(false);
@@ -511,6 +532,7 @@ export function SolverPanel() {
         open={historyOpen}
         onClose={() => setHistoryOpen(false)}
         entries={history}
+        previews={historyPreviews}
         onSelect={loadFromHistory}
         onClear={() => setHistory([])}
         onRemove={(id) => setHistory((prev) => prev.filter((h) => h.id !== id))}

@@ -14,6 +14,7 @@ interface Props {
   open: boolean;
   onClose: () => void;
   entries: HistoryEntry[];
+  previews?: Record<string, { mintermCount: number; simplified: string; error?: string }>;
   onSelect: (entry: HistoryEntry) => void;
   onClear: () => void;
   onRemove: (id: string) => void;
@@ -33,6 +34,7 @@ export function HistorySidebar({
   open,
   onClose,
   entries,
+  previews,
   onSelect,
   onClear,
   onRemove,
@@ -93,7 +95,9 @@ export function HistorySidebar({
                 </div>
               ) : (
                 <ul className="space-y-1.5">
-                  {entries.map((e) => (
+                  {entries.map((e) => {
+                    const p = previews?.[e.id];
+                    return (
                     <li key={e.id}>
                       <div className="group relative flex items-center gap-2 rounded-lg border border-border bg-card/60 pr-1 transition-colors hover:border-primary/60 hover:bg-primary/5">
                         <button
@@ -108,6 +112,23 @@ export function HistorySidebar({
                               {e.vars}-var
                             </span>
                           </div>
+                          {p && !p.error && (
+                            <div className="mt-1.5 space-y-0.5">
+                              <div className="flex items-center gap-1.5 text-[10px]">
+                                <span className="rounded bg-primary/15 px-1 py-px font-mono text-primary">
+                                  {p.mintermCount} minterm{p.mintermCount === 1 ? "" : "s"}
+                                </span>
+                                <span className="truncate font-mono text-[10px] text-accent">
+                                  → {p.simplified}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {p?.error && (
+                            <div className="mt-1 truncate text-[10px] text-destructive">
+                              ⚠ {p.error}
+                            </div>
+                          )}
                           <div className="mt-1 flex items-center gap-2 text-[10px] text-muted-foreground">
                             <span>{e.source === "example" ? "from example" : "manual"}</span>
                             <span>·</span>
@@ -126,7 +147,8 @@ export function HistorySidebar({
                         </button>
                       </div>
                     </li>
-                  ))}
+                  );
+                  })}
                 </ul>
               )}
             </div>
