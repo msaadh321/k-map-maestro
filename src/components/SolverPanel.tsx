@@ -85,6 +85,20 @@ export function SolverPanel() {
     }
   };
 
+  const applyExpression = () => {
+    try {
+      const { minterms } = parseExpression(exprInput, numVars);
+      const total = 1 << numVars;
+      const next: CellValue[] = Array(total).fill(0);
+      minterms.forEach((m) => (next[m] = 1));
+      setValues(next);
+      setMode("SOP");
+      toast.success(`Parsed expression → ${minterms.length} minterm${minterms.length === 1 ? "" : "s"}`);
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Invalid expression");
+    }
+  };
+
   const reset = () => setValues(Array(1 << numVars).fill(0));
 
   const copyExpression = () => {
