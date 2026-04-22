@@ -135,9 +135,10 @@ export function SolverPanel() {
         </div>
 
         <Tabs defaultValue="kmap" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 bg-secondary">
+          <TabsList className="grid w-full grid-cols-5 bg-secondary">
             <TabsTrigger value="kmap">K-Map</TabsTrigger>
             <TabsTrigger value="truth">Truth</TabsTrigger>
+            <TabsTrigger value="expr">Expr</TabsTrigger>
             <TabsTrigger value="minterms">Σ Min</TabsTrigger>
             <TabsTrigger value="maxterms">Π Max</TabsTrigger>
           </TabsList>
