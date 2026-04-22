@@ -16,6 +16,7 @@ import {
   solve,
   parseMinterms,
 } from "@/lib/kmap-solver";
+import { parseExpression } from "@/lib/expression-parser";
 import { toast } from "sonner";
 import { exportSolutionPDF } from "@/lib/pdf-export";
 
