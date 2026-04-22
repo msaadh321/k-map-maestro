@@ -205,6 +205,30 @@ export function SolverPanel() {
             </div>
           </TabsContent>
 
+          <TabsContent value="expr" className="mt-5 space-y-4">
+            <div>
+              <Label htmlFor="expr" className="text-xs text-muted-foreground">
+                Boolean expression — ' or ! (NOT), + (OR), implicit or * (AND), parentheses
+              </Label>
+              <Input
+                id="expr"
+                value={exprInput}
+                onChange={(e) => setExprInput(e.target.value)}
+                className="mt-1.5 font-mono"
+                placeholder="A'B + AB'C + BC"
+              />
+              <p className="mt-2 text-[11px] text-muted-foreground">
+                Examples: <span className="font-mono">A'B + AB'</span>,{" "}
+                <span className="font-mono">(A+B)(C'+D)</span>,{" "}
+                <span className="font-mono">!A*B + A*!B</span>
+              </p>
+            </div>
+            <Button onClick={applyExpression} className="w-full gap-2">
+              <Sparkles className="h-4 w-4" />
+              Generate K-Map
+            </Button>
+          </TabsContent>
+
           <TabsContent value="minterms" className="mt-5 space-y-4">
             <div>
               <Label htmlFor="mt" className="text-xs text-muted-foreground">
